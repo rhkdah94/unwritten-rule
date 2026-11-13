@@ -124,11 +124,10 @@
             let validRank = 1;
 
             rows.forEach((cols) => {
-                const firstCol = cols[0] || '';
-                const secondCol = cols[1] || '';
+                const charName = cols[1] || '';
                 
-                // 안내 문구, 제목 행, 빈 칸 등 자동 필터링 (열이 부족한 경우도 제외)
-                if (firstCol.includes('※') || secondCol.includes('순위') || secondCol === '' || cols.length < 4) {
+                // 💡 시트 제목 행("캐릭터명") 및 안내 문구, 빈 행 자동 필터링
+                if (charName === '캐릭터명' || charName.includes('※') || charName === '' || cols.length < 5) {
                     return;
                 }
 
@@ -140,12 +139,12 @@
                 else if (validRank === 2) { rankClass += ' rank-2'; rankDisplay = '🥈 2위'; }
                 else if (validRank === 3) { rankClass += ' rank-3'; rankDisplay = '🥉 3위'; }
 
-                // 💡 열 매칭 수정: cols[1]=캐릭터명, cols[2]=직업, cols[3]=전투력
+                // 💡 열 매칭: cols[1]=캐릭터명, cols[2]=직업, cols[4]=전투력 (cols[3] 직책은 제외)
                 tr.innerHTML = `
                     <td class="${rankClass}">${rankDisplay}</td>
                     <td><strong>${cols[1] || ''}</strong></td>
                     <td>${cols[2] || ''}</td>
-                    <td>${cols[3] || ''}</td>
+                    <td>${cols[4] || ''}</td>
                 `;
                 tbody.appendChild(tr);
                 validRank++;
