@@ -16,25 +16,31 @@
             --silver: #94a3b8;
             --bronze: #b45309;
             --border: #334155;
+            --up-color: #f43f5e;
+            --down-color: #38bdf8;
         }
         * { box-sizing: border-box; }
         body { font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; background: var(--bg-main); color: var(--text-primary); margin: 0; padding: 20px; }
         
-        .container { max-width: 900px; margin: 0 auto; }
+        .container { max-width: 960px; margin: 0 auto; }
         
-        header { text-align: center; margin-bottom: 30px; padding: 20px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        header { text-align: center; margin-bottom: 25px; padding: 24px 20px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
         header h1 { color: var(--accent); font-size: 26px; margin: 0 0 8px 0; text-shadow: 0 0 15px rgba(56, 189, 248, 0.3); }
-        header p { color: var(--text-secondary); margin: 0; font-size: 14px; }
+        header p { color: var(--text-secondary); margin: 0 0 12px 0; font-size: 14px; }
+
+        /* 업데이트 시간 배지 */
+        .update-badge { display: inline-flex; align-items: center; gap: 6px; background: #0f172a; border: 1px solid var(--border); color: #cbd5e1; padding: 6px 14px; border-radius: 20px; font-size: 13px; }
+        .update-dot { width: 8px; height: 8px; background: #10b981; border-radius: 50%; display: inline-block; box-shadow: 0 0 8px #10b981; }
 
         .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
         .table-wrapper { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; text-align: left; }
-        th, td { padding: 14px 16px; border-bottom: 1px solid var(--border); font-size: 15px; }
+        th, td { padding: 14px 16px; border-bottom: 1px solid var(--border); font-size: 15px; white-space: nowrap; }
         th { background: #0f172a; color: var(--accent); font-weight: 600; }
         tr:hover td { background: var(--bg-card-hover); }
         
-        /* 랭킹 열 스타일 (중앙 정렬 및 여백) */
-        .rank { text-align: center; width: 90px; vertical-align: middle; }
+        /* 랭킹 열 스타일 */
+        .rank { text-align: center; width: 80px; vertical-align: middle; }
         .rank-box { display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.2; }
         .rank-icon { font-size: 20px; margin-bottom: 2px; }
         .rank-text { font-size: 13px; font-weight: bold; }
@@ -43,6 +49,11 @@
         .rank-2 .rank-text { color: var(--silver); }
         .rank-3 .rank-text { color: var(--bronze); }
         .normal-rank { font-weight: bold; color: var(--text-secondary); font-size: 14px; }
+
+        /* 증감 수치 색상 */
+        .diff-up { color: var(--up-color); font-weight: 600; font-size: 14px; }
+        .diff-down { color: var(--down-color); font-weight: 600; font-size: 14px; }
+        .diff-same { color: var(--text-secondary); font-size: 14px; }
         
         .loading, .error { text-align: center; padding: 40px; color: var(--text-secondary); font-size: 15px; }
         .error { color: #f43f5e; }
@@ -56,6 +67,10 @@
         <header>
             <h1>⚔️ 불문율 (BULMUNYUL) 길드 랭킹</h1>
             <p>제우스 오만의신 | 구글 시트 실시간 연동 시스템</p>
+            <div class="update-badge">
+                <span class="update-dot"></span>
+                <span id="updateTime">데이터 동기화 확인 중...</span>
+            </div>
         </header>
         
         <div class="card">
@@ -69,6 +84,7 @@
                             <th>캐릭터명</th>
                             <th>직업</th>
                             <th>전투력</th>
+                            <th>이전전투력(증감)</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody"></tbody>
@@ -84,14 +100,30 @@
     <script>
         const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSEnzrZjlL9xsghEn2UwvULebdfVxxDkdX_bqXZpprWKMwFv-zEf8QYo-WtE95nDXCqPlBLCc2v71vG/pub?output=csv';
 
+        // 현재 한국 시간(KST) 포맷팅 함수
+        function getFormattedTime() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            return `${year}-${month}-${day} ${hours}:${minutes}`;
+        }
+
         async function loadData() {
             try {
-                const response = await fetch(csvUrl);
+                // 캐시 방지를 위해 타임스탬프 쿼리 추가
+                const response = await fetch(csvUrl + '&t=' + new Date().getTime());
                 if (!response.ok) throw new Error('데이터를 불러오지 못했습니다.');
                 const text = await response.text();
                 parseAndRender(text);
+                
+                // 상단 배지에 동기화(업로드) 시간 표시
+                document.getElementById('updateTime').innerText = `최근 업데이트: ${getFormattedTime()} 기준`;
             } catch (err) {
                 document.getElementById('loading').style.display = 'none';
+                document.getElementById('updateTime').innerText = '동기화 실패';
                 const errEl = document.getElementById('error');
                 errEl.style.display = 'block';
                 errEl.innerText = '로드 실패: ' + err.message;
@@ -118,6 +150,19 @@
                 return row.map(cell => cell.replace(/^"|"$/g, ''));
             });
             return lines.filter(row => row.some(cell => cell !== ''));
+        }
+
+        function formatDiff(val) {
+            if (!val || val === '-' || val === '0') {
+                return `<span class="diff-same">-</span>`;
+            }
+            if (val.includes('+') || val.includes('▲')) {
+                return `<span class="diff-up">${val}</span>`;
+            }
+            if (val.includes('-') || val.includes('▼')) {
+                return `<span class="diff-down">${val}</span>`;
+            }
+            return `<span class="diff-same">${val}</span>`;
         }
 
         function parseAndRender(csvText) {
@@ -149,11 +194,15 @@
                     rankHTML = `<div class="normal-rank">${validRank}위</div>`;
                 }
 
+                // F열(cols[5])의 이전전투력(증감) 데이터 추출
+                const diffValue = cols[5] ? cols[5].trim() : '-';
+
                 tr.innerHTML = `
                     <td class="rank">${rankHTML}</td>
                     <td><strong>${cols[1] || ''}</strong></td>
                     <td>${cols[2] || ''}</td>
                     <td>${cols[4] || ''}</td>
+                    <td>${formatDiff(diffValue)}</td>
                 `;
                 tbody.appendChild(tr);
                 validRank++;
