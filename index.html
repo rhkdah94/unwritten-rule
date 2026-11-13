@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>불문율 (BULMUNYUL) - 길드 공식 홈페이지</title>
+    <title>불문율 (BULMUNYUL) - 전투력 랭킹</title>
     <style>
         :root {
             --bg-main: #0b0f19;
@@ -18,134 +18,67 @@
             --border: #334155;
         }
         * { box-sizing: border-box; }
-        body { font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; background: var(--bg-main); color: var(--text-primary); margin: 0; padding: 0; }
+        body { font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; background: var(--bg-main); color: var(--text-primary); margin: 0; padding: 20px; }
         
-        /* 상단 네비게이션 메뉴바 */
-        nav { background: #0f172a; border-bottom: 1px solid var(--border); padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
-        .logo { font-size: 20px; font-weight: bold; color: var(--accent); letter-spacing: 1px; display: flex; align-items: center; gap: 8px; }
-        .nav-menu { display: flex; gap: 20px; list-style: none; margin: 0; padding: 0; }
-        .nav-menu li a { color: var(--text-secondary); text-decoration: none; font-size: 14px; font-weight: 600; transition: color 0.2s; cursor: pointer; }
-        .nav-menu li a:hover, .nav-menu li a.active { color: var(--accent); }
+        .container { max-width: 900px; margin: 0 auto; }
+        
+        /* 헤더 디자인 */
+        header { text-align: center; margin-bottom: 30px; padding: 20px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        header h1 { color: var(--accent); font-size: 26px; margin: 0 0 8px 0; text-shadow: 0 0 15px rgba(56, 189, 248, 0.3); }
+        header p { color: var(--text-secondary); margin: 0; font-size: 14px; }
 
-        /* 메인 컨테이너 */
-        .container { max-width: 1000px; margin: 30px auto; padding: 0 20px; }
-        
-        /* 섹션 공통 스타일 */
-        .section { display: none; }
-        .section.active { display: block; }
-
-        /* 카드 디자인 */
-        .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); margin-bottom: 20px; }
-        .card h2 { margin-top: 0; color: var(--accent); font-size: 22px; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
-        
-        /* 랭킹 테이블 */
+        /* 메인 카드 및 테이블 */
+        .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
         .table-wrapper { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; text-align: left; }
-        th, td { padding: 14px 18px; border-bottom: 1px solid var(--border); font-size: 15px; }
-        th { background: #0f172a; color: var(--accent); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th, td { padding: 14px 16px; border-bottom: 1px solid var(--border); font-size: 15px; }
+        th { background: #0f172a; color: var(--accent); font-weight: 600; }
         tr:hover td { background: var(--bg-card-hover); }
         
-        .rank { font-weight: bold; text-align: center; width: 60px; }
-        .rank-1 { color: var(--gold); }
-        .rank-2 { color: var(--silver); }
-        .rank-3 { color: var(--bronze); }
+        .rank { font-weight: bold; text-align: center; width: 70px; }
+        .rank-1 { color: var(--gold); font-size: 17px; }
+        .rank-2 { color: var(--silver); font-size: 16px; }
+        .rank-3 { color: var(--bronze); font-size: 16px; }
         
-        .loading, .error { text-align: center; padding: 40px; color: var(--text-secondary); font-size: 16px; }
+        .loading, .error { text-align: center; padding: 40px; color: var(--text-secondary); font-size: 15px; }
         .error { color: #f43f5e; }
         
-        /* 공지사항 스타일 */
-        .notice-item { padding: 15px 0; border-bottom: 1px solid var(--border); }
-        .notice-item:last-child { border-bottom: none; }
-        .notice-title { font-weight: bold; color: var(--text-primary); font-size: 16px; margin-bottom: 5px; }
-        .notice-date { font-size: 12px; color: var(--text-secondary); }
-
-        footer { text-align: center; padding: 40px; color: var(--text-secondary); font-size: 13px; }
+        footer { text-align: center; padding: 30px; color: var(--text-secondary); font-size: 13px; }
     </style>
 </head>
 <body>
 
-    <!-- 상단 네비게이션 메뉴 -->
-    <nav>
-        <div class="logo">⚔️ 불문율 (BULMUNYUL)</div>
-        <ul class="nav-menu">
-            <li><a onclick="switchTab('home')" class="active" id="btn-home">홈 소개</a></li>
-            <li><a onclick="switchTab('ranking')" id="btn-ranking">전투력 랭킹</a></li>
-            <li><a onclick="switchTab('notice')" id="btn-notice">공지사항</a></li>
-        </ul>
-    </nav>
-
     <div class="container">
+        <header>
+            <h1>⚔️ 불문율 (BULMUNYUL) 길드 랭킹</h1>
+            <p>제우스 오만의신 | 구글 시트 실시간 연동 시스템</p>
+        </header>
         
-        <!-- [1] 홈 소개 섹션 -->
-        <div id="section-home" class="section active">
-            <div class="card">
-                <h2>👑 길드 소개</h2>
-                <p>제우스 오만의신 <strong>'불문율'</strong> 길드 공식 홈페이지에 오신 것을 환영합니다.</p>
-                <p>본 사이트는 구글 시트와 실시간 연동되어 길드원들의 전투력과 직업 현황을 투명하고 깔끔하게 제공합니다. 상단 메뉴에서 랭킹과 공지사항을 확인하세요.</p>
-            </div>
-            <div class="card">
-                <h2>📌 길드 운영 방침</h2>
-                <ul>
-                    <li>매일 갱신되는 전투력 랭킹 자동 반영</li>
-                    <li>상호 존중 및 원활한 길드 레이드/컨텐츠 참여</li>
-                </ul>
-            </div>
-        </div>
-
-        <!-- [2] 전투력 랭킹 섹션 (구글 시트 연동 + 쓰레기 데이터 자동 필터링) -->
-        <div id="section-ranking" class="section">
-            <div class="card">
-                <h2>📊 길드원 실시간 전투력 랭킹</h2>
-                <div id="loading" class="loading">구글 시트에서 최신 데이터를 불러오는 중입니다...</div>
-                <div id="error" class="error" style="display:none;"></div>
-                <div class="table-wrapper">
-                    <table id="rankTable" style="display: none;">
-                        <thead>
-                            <tr>
-                                <th class="rank">순위</th>
-                                <th>캐릭터명</th>
-                                <th>직업</th>
-                                <th>전투력</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tableBody"></tbody>
-                    </table>
-                </div>
+        <div class="card">
+            <div id="loading" class="loading">구글 시트에서 랭킹 데이터를 불러오는 중입니다...</div>
+            <div id="error" class="error" style="display:none;"></div>
+            <div class="table-wrapper">
+                <table id="rankTable" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th class="rank">순위</th>
+                            <th>캐릭터명</th>
+                            <th>직업</th>
+                            <th>전투력</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
             </div>
         </div>
 
-        <!-- [3] 공지사항 섹션 -->
-        <div id="section-notice" class="section">
-            <div class="card">
-                <h2>📢 길드 공지사항</h2>
-                <div class="notice-item">
-                    <div class="notice-title">길드 홈페이지 오픈 안내</div>
-                    <div class="notice-date">2026-04-12 | 운영진</div>
-                </div>
-                <div class="notice-item">
-                    <div class="notice-title">정기 레이드 및 컨텐츠 참여 협조 안내</div>
-                    <div class="notice-date">2026-04-10 | 운영진</div>
-                </div>
-            </div>
-        </div>
-
+        <footer>
+            © 2026 BULMUNYUL GUILD. All rights reserved.
+        </footer>
     </div>
 
-    <footer>
-        © 2026 BULMUNYUL GUILD. All rights reserved.
-    </footer>
-
     <script>
-        // 상단 메뉴 탭 전환 함수
-        function switchTab(tabId) {
-            document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.nav-menu a').forEach(el => el.classList.remove('active'));
-            
-            document.getElementById('section-' + tabId).classList.add('active');
-            document.getElementById('btn-' + tabId).classList.add('active');
-        }
-
-        // 구글 시트 CSV 자동 연동 주소
+        // 구글 시트 연동 주소
         const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSEnzrZjlL9xsghEn2UwvULebdfVxxDkdX_bqXZpprWKMwFv-zEf8QYo-WtE95nDXCqPlBLCc2v71vG/pub?output=csv';
 
         async function loadData() {
@@ -158,7 +91,7 @@
                 document.getElementById('loading').style.display = 'none';
                 const errEl = document.getElementById('error');
                 errEl.style.display = 'block';
-                errEl.innerText = '데이터 로드 실패: ' + err.message;
+                errEl.innerText = '로드 실패: ' + err.message;
             }
         }
 
@@ -195,19 +128,21 @@
 
             rows.forEach((cols) => {
                 const firstCol = cols[0] || '';
-                // 💡 안내 문구(※), 제목 행, 빈 칸 등은 자동으로 걸러냄
+                // 안내 문구나 불필요한 빈 행 자동 필터링
                 if (firstCol.includes('※') || firstCol.includes('순위') || firstCol === '' || cols.length < 3) {
                     return;
                 }
 
                 const tr = document.createElement('tr');
                 let rankClass = 'rank';
-                if (validRank === 1) rankClass += ' rank-1';
-                else if (validRank === 2) rankClass += ' rank-2';
-                else if (validRank === 3) rankClass += ' rank-3';
+                let rankDisplay = validRank;
+
+                if (validRank === 1) { rankClass += ' rank-1'; rankDisplay = '🥇 1위'; }
+                else if (validRank === 2) { rankClass += ' rank-2'; rankDisplay = '🥈 2위'; }
+                else if (validRank === 3) { rankClass += ' rank-3'; rankDisplay = '🥉 3위'; }
 
                 tr.innerHTML = `
-                    <td class="${rankClass}">${validRank}</td>
+                    <td class="${rankClass}">${rankDisplay}</td>
                     <td><strong>${cols[0] || ''}</strong></td>
                     <td>${cols[1] || ''}</td>
                     <td>${cols[2] || ''}</td>
