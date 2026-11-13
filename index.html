@@ -33,10 +33,16 @@
         th { background: #0f172a; color: var(--accent); font-weight: 600; }
         tr:hover td { background: var(--bg-card-hover); }
         
-        .rank { font-weight: bold; text-align: center; width: 80px; }
-        .rank-1 { color: var(--gold); font-size: 16px; }
-        .rank-2 { color: var(--silver); font-size: 15px; }
-        .rank-3 { color: var(--bronze); font-size: 15px; }
+        /* 랭킹 열 스타일 (중앙 정렬 및 여백) */
+        .rank { text-align: center; width: 90px; vertical-align: middle; }
+        .rank-box { display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.2; }
+        .rank-icon { font-size: 20px; margin-bottom: 2px; }
+        .rank-text { font-size: 13px; font-weight: bold; }
+        
+        .rank-1 .rank-text { color: var(--gold); }
+        .rank-2 .rank-text { color: var(--silver); }
+        .rank-3 .rank-text { color: var(--bronze); }
+        .normal-rank { font-weight: bold; color: var(--text-secondary); font-size: 14px; }
         
         .loading, .error { text-align: center; padding: 40px; color: var(--text-secondary); font-size: 15px; }
         .error { color: #f43f5e; }
@@ -126,22 +132,25 @@
             rows.forEach((cols) => {
                 const charName = cols[1] || '';
                 
-                // 💡 시트 제목 행("캐릭터명") 및 안내 문구, 빈 행 자동 필터링
                 if (charName === '캐릭터명' || charName.includes('※') || charName === '' || cols.length < 5) {
                     return;
                 }
 
                 const tr = document.createElement('tr');
-                let rankClass = 'rank';
-                let rankDisplay = validRank + '위';
+                let rankHTML = '';
 
-                if (validRank === 1) { rankClass += ' rank-1'; rankDisplay = '🥇 1위'; }
-                else if (validRank === 2) { rankClass += ' rank-2'; rankDisplay = '🥈 2위'; }
-                else if (validRank === 3) { rankClass += ' rank-3'; rankDisplay = '🥉 3위'; }
+                if (validRank === 1) {
+                    rankHTML = `<div class="rank-box rank-1"><div class="rank-icon">🥇</div><div class="rank-text">1위</div></div>`;
+                } else if (validRank === 2) {
+                    rankHTML = `<div class="rank-box rank-2"><div class="rank-icon">🥈</div><div class="rank-text">2위</div></div>`;
+                } else if (validRank === 3) {
+                    rankHTML = `<div class="rank-box rank-3"><div class="rank-icon">🥉</div><div class="rank-text">3위</div></div>`;
+                } else {
+                    rankHTML = `<div class="normal-rank">${validRank}위</div>`;
+                }
 
-                // 💡 열 매칭: cols[1]=캐릭터명, cols[2]=직업, cols[4]=전투력 (cols[3] 직책은 제외)
                 tr.innerHTML = `
-                    <td class="${rankClass}">${rankDisplay}</td>
+                    <td class="rank">${rankHTML}</td>
                     <td><strong>${cols[1] || ''}</strong></td>
                     <td>${cols[2] || ''}</td>
                     <td>${cols[4] || ''}</td>
